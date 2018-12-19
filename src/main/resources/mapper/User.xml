@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace为命名空间，应该是mapper接口的全称-->
+<mapper namespace="com.learn.nolan.dao.ManagerUserDao">
+
+    <!--  定义resultMap 将id id_ username username_ 做映射
+        type表示resultMap最终映射的java对象类型
+        id表示resultMap的一个唯一标识,即主键的映射
+        result表示resultMap对查询结果其他列的映射
+        column表示查询出来的列名
+        property表示type指定的bean类型属性名
+        association 表示用于映射关联查询的单个对象的信息
+        collection对关联查询到多条信息映射到集合对象中
+        collection与association中的property表示对应的mapper.java中哪一个属性
+        ofType表示映射到list集合属性的bean类型
+        javaType表示association该属性的集合类型
+        extends表示继承，不用重复配置，继承中内容是其他resultMap的id
+        -->
+    <resultMap id="userResultMap" type="com.learn.nolan.model.DO.ManagerUserDO">
+        <id column="id" property="id"/>
+        <result column="user_name" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="role" property="role"/>
+        <!-- <association property="user" javaType="com.quinnnorris.mybatis.bean.User">
+            <id column="" property="" />
+            <result column="" property="" />
+        </association> -->
+        <!--<collection property="orderdetails" ofType="com.quinnnorris.mybatis.bean.Orderdetail">
+            <id column="" property=""/>
+            <result column="" property=""/>
+        </collection>-->
+    </resultMap>
+
+    <!-- 定义sql片段
+        id是唯一表示sql片段
+        习惯上，我们基于单表定义sql片段，这样重用性高
+        习惯上，在sql片段中不使用where-->
+    <sql id="insert_columns">
+        user_name,
+        password,
+        role
+    </sql>
+
+    <sql id="query_columns">
+        id,
+        user_name,
+        password,
+        role
+    </sql>
+
+    <select id="size" resultType="long">
+        select count (id)
+        from user
+    </select>
+
+    <select id="queryById" resultMap="userResultMap">
+        select
+        <include refid="query_columns"/>
+        from user
+        where
+        id=#{id}
+    </select>
+
+    <select id="query" resultMap="userResultMap">
+        select
+        <include refid="query_columns"/>
+        from user
+    </select>
+
+    <insert id="insert" parameterType="ManagerUserDO">
+        insert into user
+        (<include refid="insert_columns"/>)
+        values (
+        #{userName},
+        #{password},
+        #{role}
+        )
+    </insert>
+
+    <update id="update" parameterType="ManagerUserDO">
+        update user
+        set
+        password=#{password},
+        role = #{role}
+        where
+        user_name=#{userName}
+    </update>
+
+    <delete id="delete">
+        delete user
+        where
+        id=#{id}
+    </delete>
+
+    <select id="pageQuery" resultMap="userResultMap">
+        select
+        <include refid="query_columns"/>
+        from user
+        order by id asc
+        limit #{start},#{size}
+    </select>
+
+    <!--<sql id="queryUserWhere">-->
+    <!--<if test="userCustom!=null">-->
+    <!--<if test="userCustom.sex!=null and userCustom.sex!=' '">-->
+    <!--user.sex = #{userCustom.sex}-->
+    <!--</if>-->
+    <!--<if test="userCustom.username!=null and userCustom.username!=' '">-->
+    <!--user.username LIKE '%${UserCustom.username}%'-->
+    <!--</if>-->
+    <!--<if test="ids!=null">-->
+    <!--&lt;!&ndash; 使用foreach遍历传入的ids-->
+    <!--collection指定输入对象中集合的属性-->
+    <!--item表示每个便利生成对象-->
+    <!--open表示开始遍历时拼接的字符串-->
+    <!--close表示结束遍历时拼接的字符串-->
+    <!--separator遍历的两个对象中间需要拼接的字符串-->
+    <!--&ndash;&gt;-->
+    <!--<foreach collection="ids" item="item_id" open="AND (" close=")" separator="OR">-->
+    <!--id=#{item_id}-->
+    <!--</foreach>-->
+    <!--</if>-->
+    <!--</if>-->
+    <!--</sql>-->
+
+
+    <!--&lt;!&ndash; 用户信息综合查询&ndash;&gt;-->
+    <!--<select id="findUserList" parameterType="UserQueryVo" resultType="UserCustom">-->
+    <!--SELECT * FROM USER-->
+    <!--&lt;!&ndash;  where会自动去掉第一个条件的and-->
+    <!--refid是指定的sql片段id，如果不再此xml中需要namespace&ndash;&gt;-->
+    <!--<where>-->
+    <!--<include refid="queryUserWhere"></include>-->
+    <!--</where>-->
+    <!--</select>-->
+
+    <!--&lt;!&ndash; 用户信息综合查询总数目&ndash;&gt;-->
+    <!--<select id="findUserCount" parameterType="UserQueryVo" resultType="int">-->
+    <!--SELECT count(*) FROM USER-->
+    <!--<where>-->
+    <!--<include refid="queryUserWhere"></include>-->
+    <!--</where>-->
+    <!--</select>-->
+
+    <!--&lt;!&ndash; 在映射文件中配置sql语句，并配置输入对象类型，输出对象类型，id-->
+    <!--其中使用#{}表示占位符，其中填写参数，例如：#{id}。-->
+    <!--如果占位符中的类型是简单类型则参数名可以任意填写。-->
+    <!--resultType指定sql输出结果的所映射的java对象类型-->
+    <!--select指定resultType表示将单条记录映射成的java对象。-->
+    <!--&ndash;&gt;-->
+
+    <!--&lt;!&ndash; 如果将select中的属性改名，那么结果将不能正确的映射！&ndash;&gt;-->
+
+    <!--<select id="findUserById" parameterType="int" resultType="com.quinnnorris.mybatis.bean.User">-->
+    <!--SELECT * FROM USER WHERE id = #{id}-->
+    <!--</select>-->
+
+
+    <!--&lt;!&ndash; 如果这个resultMap在其他的mapper.xml文件中，那么需要加上namespace前缀&ndash;&gt;-->
+    <!--<select id="findUserByIdResultMap" parameterType="int" resultMap="userResultMap">-->
+    <!--SELECT id id_,username username_ FROM USER WHERE id = #{id}-->
+    <!--</select>-->
+
+    <!--&lt;!&ndash; ${}表示拼接sql串，将接收到的参数不加任何修改的传入sql语句中-->
+    <!--会存在注入攻击的问题。-->
+    <!--如果传入简单类型，只能使用value作为参数接受输入参数的内容，即${value}-->
+    <!--&ndash;&gt;-->
+
+    <!--<select id="findUserByName" parameterType="java.lang.String" resultType="com.quinnnorris.mybatis.bean.User">-->
+    <!--SELECT * FROM USER WHERE NAME LIKE '%${value}%'-->
+    <!--</select>-->
+
+    <!--&lt;!&ndash; #{}中指定bean的属性名，通过属性名接收到bean对象的属性值。-->
+    <!--selectKey是将插入数据insert的主键返回到parameterType对象的keyProperty属性（也就是id）中-->
+    <!--order表示执行顺序，selectKey的执行在insert后。-->
+    <!--SELECT last_insert_id()表示得到刚执行的insert语句的自增id，-->
+    <!--这句sql执行成功的必要条件：1.id是自增的 2.在insert后紧跟执行此语句-->
+    <!--resultType指定selectKey的结果类型-->
+    <!--&ndash;&gt;-->
+
+    <!--<insert id="insertUser" parameterType="com.quinnnorris.mybatis.bean.User">-->
+    <!--<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">-->
+    <!--SELECT last_insert_id()-->
+    <!--</selectKey>-->
+    <!--INSERT INTO USER (username,birthday,sex,address) value (#{username},#{birthday},#{sex},#{address})-->
+    <!--&lt;!&ndash; 使用mysql的uuid非自增的生成主键，先用selectKey的BEFORE生成主键，填充到user的id中，-->
+    <!--注意uuid生成的主键需要为String类型。-->
+    <!--在insert语句中需要填写id属性，此时id属性是uuid已经填充好的情况。-->
+
+    <!--<selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">-->
+    <!--SELECT uuid()-->
+    <!--</selectKey>-->
+    <!--INSERT INTO USER (id,username,birthday,sex,address) value (#{id},#{username},#{birthday},#{sex},#{address})-->
+    <!--&ndash;&gt;-->
+    <!--</insert>-->
+
+    <!--<delete id="deleteUser" parameterType="int">-->
+    <!--DELETE FROM USER WHERE id = #{id}-->
+    <!--</delete>-->
+
+    <!--<update id="updateUser" parameterType="com.quinnnorris.mybatis.bean.User">-->
+    <!--UPDATE USER SET sex=#{sex},username=#{username},birthday=#{birthday} WHERE id = #{id}-->
+    <!--</update>-->
+
+</mapper>

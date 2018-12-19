@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace为命名空间，应该是mapper接口的全称-->
+<mapper namespace="com.learn.nolan.dao.GoodsSaleInfoDao">
+
+    <!--  定义resultMap 将id id_ username username_ 做映射
+        type表示resultMap最终映射的java对象类型
+        id表示resultMap的一个唯一标识,即主键的映射
+        result表示resultMap对查询结果其他列的映射
+        column表示查询出来的列名
+        property表示type指定的bean类型属性名
+        association 表示用于映射关联查询的单个对象的信息
+        collection对关联查询到多条信息映射到集合对象中
+        collection与association中的property表示对应的mapper.java中哪一个属性
+        ofType表示映射到list集合属性的bean类型
+        javaType表示association该属性的集合类型
+        extends表示继承，不用重复配置，继承中内容是其他resultMap的id
+        -->
+    <resultMap id="GoodsSaleInfoMap" type="com.learn.nolan.model.DO.GoodsSaleInfoDO">
+        <id column="id" property="id"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="total_sale" property="totalSale"/>
+        <!-- <association property="user" javaType="com.quinnnorris.mybatis.bean.User">
+            <id column="" property="" />
+            <result column="" property="" />
+        </association> -->
+        <!--<collection property="orderdetails" ofType="com.quinnnorris.mybatis.bean.Orderdetail">
+            <id column="" property=""/>
+            <result column="" property=""/>
+        </collection>-->
+    </resultMap>
+
+    <!-- 定义sql片段
+        id是唯一表示sql片段
+        习惯上，我们基于单表定义sql片段，这样重用性高
+        习惯上，在sql片段中不使用where-->
+    <sql id="insert_columns">
+        goods_name,
+        total_sale
+    </sql>
+
+    <sql id="query_columns">
+        id,
+        goods_name,
+        total_sale
+    </sql>
+
+    <select id="queryById" resultMap="GoodsSaleInfoMap">
+        select
+        <include refid="query_columns"/>
+        from goods_sale_info
+        where
+        id=#{id}
+    </select>
+
+    <select id="query" resultMap="GoodsSaleInfoMap">
+        select
+        <include refid="query_columns"/>
+        from goods_sale_info
+    </select>
+
+    <insert id="insert" parameterType="com.learn.nolan.model.DO.GoodsSaleInfoDO">
+        insert into goods_sale_info
+        (<include refid="insert_columns"/>)
+        values (
+        #{goodsName},
+        #{totalSale}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.learn.nolan.model.DO.GoodsSaleInfoDO">
+        update user
+        set
+        goods_name=#{goodsName},
+        total_sale = #{totalSale}
+        where
+        id=#{id}
+    </update>
+
+    <delete id="delete">
+        delete user
+        where
+        id=#{id}
+    </delete>
+
+</mapper>

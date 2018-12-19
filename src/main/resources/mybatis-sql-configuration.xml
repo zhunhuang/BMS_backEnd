@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+    <!--<settings>-->
+    <!--</settings>-->
+
+    <typeAliases>
+        <typeAlias alias="ManagerUserDO" type="com.learn.nolan.model.DO.ManagerUserDO"/>
+    </typeAliases>
+
+    <typeHandlers>
+    </typeHandlers>
+
+    <plugins>
+        <plugin interceptor="com.learn.nolan.interceptor.MybatisInterceptor"/>
+    </plugins>
+</configuration>
